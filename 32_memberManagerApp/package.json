@@ -1,0 +1,22 @@
+{
+  "name": "project01",
+  "version": "1.0.0",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dist/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "tsc -init",
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/readline-sync": "^1.4.8"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.13",
+    "node": "^23.5.0",
+    "readline-sync": "^1.4.10"
+  }
+}
