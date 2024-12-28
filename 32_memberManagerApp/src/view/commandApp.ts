@@ -49,6 +49,7 @@ function runApp(): void {
 					break;
 				case 6:
 					if (loggedInMember === null) break;
+					handleAccountDeletion();
 					break;
 				case 99:
 					return;
@@ -233,7 +234,9 @@ function handleEditPassword(): void {
 	console.log('새로운 비밀번호를 입력해주세요.');
 	const newPassword: string = handlePasswordInput();
 
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { password: newPassword });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		password: newPassword,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
@@ -248,7 +251,9 @@ function handleEditName(): void {
 	console.log('새로운 이름을 입력해주세요.');
 	const newName: string = handleNameInput();
 
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { name: newName });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		name: newName,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
@@ -263,7 +268,9 @@ function handleEditAge(): void {
 	console.log('새로운 나이를 입력해주세요.');
 	const newAge: number = handleAgeInput();
 
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { age: newAge });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		age: newAge,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
@@ -278,7 +285,9 @@ function handleEditPhone(): void {
 	console.log('새로운 전화번호를 입력해주세요.');
 	const newPhone: string = handlePhoneInput();
 
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { phone: newPhone });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		phone: newPhone,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
@@ -328,7 +337,9 @@ function handleAddHobby(): void {
 	const hobbyArray: string[] = loggedInMember?.hobby ?? [];
 	const newHobbyArray = [...hobbyArray];
 	newHobbyArray.push(newHobby);
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { hobby: newHobbyArray });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		hobby: newHobbyArray,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
@@ -358,13 +369,34 @@ function handleDeleteHobby(): void {
 
 	const newHobbyArray = [...hobbyArray];
 	newHobbyArray.splice(selectedNumber, 1);
-	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { hobby: newHobbyArray });
+	const updatedMember: Member | null = updateMemberInfo(loggedInMember?.mno ?? null, {
+		hobby: newHobbyArray,
+	});
 
 	if (updatedMember) {
 		loggedInMember = updatedMember;
 		console.log('취미가 삭제되었습니다.');
 	} else {
 		console.log('취미를 삭제하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 6. 탈퇴하기
+function handleAccountDeletion(): void {
+	console.log('<회원 탈퇴하기>\n정말로 탈퇴하시겠습니까? (Y/N)');
+	const answer = reader.question('> ');
+
+	if (answer === 'Y') {
+		const deletedId: string | null = loggedInMember?.memberId ?? null;
+		deleteMember(loggedInMember?.mno ?? null);
+		loggedInMember = null;
+		console.log(`${deletedId}님이 탈퇴 되었습니다.`);
+		return;
+	}
+
+	if (answer === 'N') {
+		console.log('취소하였습니다.');
+		return;
 	}
 }
 

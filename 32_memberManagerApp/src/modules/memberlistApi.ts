@@ -6,7 +6,7 @@ const memberList: Member[] = [
 	{
 		mno: 1,
 		memberId: 'sean12',
-		password: 'test1234',
+		password: '1234',
 		name: 'Sean',
 		age: 26,
 		phone: '010-1234-5678',
@@ -61,12 +61,21 @@ export function createMember(newMember: Member): boolean {
 	return true;
 }
 
-export function updateMemberInfo(mno: number, updatedData: Object): Member {
+export function updateMemberInfo(mno: number | null, updatedData: Object): Member | null {
+	if (mno === null) {
+		return null;
+	}
+
 	const findedMemberIndex: number = memberList.findIndex((member) => member.mno === mno);
 	memberList[findedMemberIndex] = { ...memberList[findedMemberIndex], ...updatedData };
 	return memberList[findedMemberIndex];
 }
 
-export function deleteMember(mno: number): boolean {
+export function deleteMember(mno: number | null): boolean | null {
+	if (mno === null) {
+		return null;
+	}
+	const findedMemberIndex: number = memberList.findIndex((member) => member.mno === mno);
+	memberList.splice(findedMemberIndex, 1);
 	return true;
 }
