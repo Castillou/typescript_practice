@@ -51,8 +51,9 @@ export function getMemberListAll(): Member[] {
 	return memberList;
 }
 
-export function getOneMember(mno: number): Member | null {
-	return null;
+export function getOneMember(id: string): Member | null {
+	const findedMember: Member | null = memberList.find((member) => member.memberId === id) ?? null;
+	return findedMember;
 }
 
 export function createMember(newMember: Member): boolean {
