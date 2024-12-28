@@ -5,10 +5,10 @@ import Member from '../model/Member';
 const memberList: Member[] = [
 	{
 		mno: 1,
-		memberId: 'johnny',
-		password: 'pass1234',
-		name: 'John',
-		age: 28,
+		memberId: 'sean12',
+		password: 'test1234',
+		name: 'Sean',
+		age: 26,
 		phone: '010-1234-5678',
 		hobby: ['reading', 'cycling', 'gaming'],
 		createdDate: new Date('2024-01-01'),
@@ -61,8 +61,10 @@ export function createMember(newMember: Member): boolean {
 	return true;
 }
 
-export function updateMemberInfo(mno: number): boolean {
-	return true;
+export function updateMemberInfo(mno: number, updatedData: Object): Member {
+	const findedMemberIndex: number = memberList.findIndex((member) => member.mno === mno);
+	memberList[findedMemberIndex] = { ...memberList[findedMemberIndex], ...updatedData };
+	return memberList[findedMemberIndex];
 }
 
 export function deleteMember(mno: number): boolean {

@@ -14,17 +14,18 @@ import {
 	handlePasswordInput,
 	handleAgeInput,
 	handlePhoneInput,
+	handleHobbyInput,
 } from './inputHandlers';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
 
-let isLoggedIn: Member | null = null;
+let loggedInMember: Member | null = null;
 
 function runApp(): void {
 	while (true) {
 		try {
-			isLoggedIn === null ? printMenu() : printLoginMenu();
+			loggedInMember === null ? printMenu() : printLoginMenu();
 			const input = reader.question('> ');
 			// console.log("입력값 :",input);
 			const menuNum = Number(input);
@@ -39,9 +40,15 @@ function runApp(): void {
 					handleLogin();
 					break;
 				case 4:
+					if (loggedInMember === null) break;
 					handleLogout();
 					break;
 				case 5:
+					if (loggedInMember === null) break;
+					handleEditMemberInfo();
+					break;
+				case 6:
+					if (loggedInMember === null) break;
 					break;
 				case 99:
 					return;
@@ -51,7 +58,6 @@ function runApp(): void {
 			console.log('');
 		} catch (error) {
 			console.error(`[ERROR] ${error}`);
-			console.log('잘못된 입력입니다.\n');
 		}
 	}
 }
@@ -66,7 +72,9 @@ function printMenu(): void {
 
 function printLoginMenu(): void {
 	console.log('<회원정보 관리 프로그램>');
-	console.log(`로그인 되었습니다. [id: ${isLoggedIn?.memberId} / 이름: ${isLoggedIn?.name}]`);
+	console.log(
+		`로그인 되었습니다. [id: ${loggedInMember?.memberId} / 이름: ${loggedInMember?.name}]`
+	);
 	console.log('1. 회원정보 리스트 보기');
 	console.log('2. 회원가입 하기');
 	console.log('3. 로그인');
@@ -124,7 +132,7 @@ function validatePassword(member: Member): void {
 }
 
 // 1. 회원정보 리스트 보기
-function printMemberList() {
+function printMemberList(): void {
 	const memberList: Member[] = getMemberListAll();
 	let renderText: string = '\n<회원 목록>';
 	renderText += createListText(memberList);
@@ -132,7 +140,7 @@ function printMemberList() {
 }
 
 // 2. 회원가입 기능
-function handleSignup() {
+function handleSignup(): void {
 	console.log('\n<회원 가입>');
 
 	console.log('아이디를 입력해주세요.');
@@ -162,26 +170,202 @@ function handleSignup() {
 }
 
 // 3. 로그인 기능
-function handleLogin() {
+function handleLogin(): void {
 	console.log('\n아이디를 입력해주세요.');
 	const findedMember: Member = validateAndFetchMember();
 	console.log('비밀번호를 입력해주세요.');
 	validatePassword(findedMember);
 
-	isLoggedIn = findedMember;
+	loggedInMember = findedMember;
 	console.log('로그인에 성공하였습니다.');
 }
 
 // 4. 로그아웃 기능
-function handleLogout() {
-	if (isLoggedIn === null) {
+function handleLogout(): void {
+	if (loggedInMember === null) {
 		return;
 	}
 
-	const logoutMemberId = isLoggedIn.memberId;
-	isLoggedIn = null;
+	const logoutMemberId = loggedInMember.memberId;
+	loggedInMember = null;
 
 	console.log(`${logoutMemberId}님이 로그아웃 하였습니다.`);
+}
+
+// 5. 회원정보 수정 기능
+function handleEditMemberInfo(): void {
+	console.log(
+		'\n<회원정보 수정>\n변경할 항목을 선택하세요.\n1. 비밀번호 변경\n2. 이름 변경\n3. 나이 변경\n4. 전화번호 변경\n5. 취미 변경'
+	);
+	try {
+		const input = reader.question('> ');
+		// console.log("입력값 :",input);
+		const selectedNumber = Number(input);
+		switch (selectedNumber) {
+			case 1:
+				handleEditPassword();
+				break;
+			case 2:
+				handleEditName();
+				break;
+			case 3:
+				handleEditAge();
+				break;
+			case 4:
+				handleEditPhone();
+				break;
+			case 5:
+				handleEditHobby();
+				break;
+			case 99:
+				console.log('취소하였습니다.');
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		console.error(`[ERROR] ${error}`);
+	}
+}
+
+// 5-1. 비밀번호 변경
+function handleEditPassword(): void {
+	console.log('새로운 비밀번호를 입력해주세요.');
+	const newPassword: string = handlePasswordInput();
+
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { password: newPassword });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('비밀번호가 변경되었습니다.');
+	} else {
+		console.log('비밀번호를 변경하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 5-2. 이름 변경
+function handleEditName(): void {
+	console.log('새로운 이름을 입력해주세요.');
+	const newName: string = handleNameInput();
+
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { name: newName });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('이름이 변경되었습니다.');
+	} else {
+		console.log('이름을 변경하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 5-3. 나이 변경
+function handleEditAge(): void {
+	console.log('새로운 나이를 입력해주세요.');
+	const newAge: number = handleAgeInput();
+
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { age: newAge });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('나이가 변경되었습니다.');
+	} else {
+		console.log('나이를 변경하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 5-4. 전화번호 변경
+function handleEditPhone(): void {
+	console.log('새로운 전화번호를 입력해주세요.');
+	const newPhone: string = handlePhoneInput();
+
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { phone: newPhone });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('전화번호가 변경되었습니다.');
+	} else {
+		console.log('전화번호를 변경하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 5-5. 취미 변경
+function handleEditHobby(): void {
+	console.log('\n<취미 추가 및 삭제>\n(추가: 1, 삭제: 2)');
+
+	if (loggedInMember?.hobby) {
+		loggedInMember.hobby.forEach((item, index) => console.log(`${index + 1}. ${item}`));
+	}
+	if (loggedInMember?.hobby === undefined) {
+		console.log(`아직 취미가 없습니다.`);
+	}
+
+	try {
+		const input = reader.question('> ');
+		const selectedNumber = Number(input);
+		switch (selectedNumber) {
+			case 1:
+				handleAddHobby();
+				break;
+			case 2:
+				handleDeleteHobby();
+				break;
+			case 99:
+				console.log('취소하였습니다.');
+				return;
+			default:
+				break;
+		}
+	} catch (error) {
+		console.error(`[ERROR] ${error}`);
+	}
+}
+
+// 5-5-1. 취미 추가하기
+function handleAddHobby(): void {
+	console.log('추가할 취미를 입력해주세요.');
+	const newHobby: string = handleHobbyInput();
+
+	const hobbyArray: string[] = loggedInMember?.hobby ?? [];
+	const newHobbyArray = [...hobbyArray];
+	newHobbyArray.push(newHobby);
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { hobby: newHobbyArray });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('취미가 추가되었습니다.');
+	} else {
+		console.log('취미를 추가하는데 실패했습니다. 다시 시도해주세요.');
+	}
+}
+
+// 5-5-2. 취미 삭제하기
+function handleDeleteHobby(): void {
+	const hobbyArray: string[] = loggedInMember?.hobby ?? [];
+
+	if (hobbyArray.length === 0) {
+		console.log('삭제할 취미가 없습니다.');
+		return;
+	}
+
+	console.log('삭제할 취미의 번호를 입력해주세요.');
+	const input = reader.question('> ');
+	const selectedNumber = Number(input) - 1;
+
+	if (!hobbyArray[selectedNumber]) {
+		console.log('존재하지 않는 번호입니다. 다시 입력해주세요.');
+		return handleDeleteHobby();
+	}
+
+	const newHobbyArray = [...hobbyArray];
+	newHobbyArray.splice(selectedNumber, 1);
+	const updatedMember: Member = updateMemberInfo(loggedInMember!.mno, { hobby: newHobbyArray });
+
+	if (updatedMember) {
+		loggedInMember = updatedMember;
+		console.log('취미가 삭제되었습니다.');
+	} else {
+		console.log('취미를 삭제하는데 실패했습니다. 다시 시도해주세요.');
+	}
 }
 
 export default runApp;
