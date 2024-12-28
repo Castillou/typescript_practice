@@ -19,12 +19,12 @@ import {
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
 
-let loginToken: boolean = false;
+let isLoggedIn: Member | null = null;
 
 function runApp(): void {
 	while (true) {
 		try {
-			loginToken ? printLoginMenu() : printMenu();
+			isLoggedIn === null ? printMenu() : printLoginMenu();
 			const input = reader.question('> ');
 			// console.log("입력값 :",input);
 			const menuNum = Number(input);
@@ -39,6 +39,7 @@ function runApp(): void {
 					handleLogin();
 					break;
 				case 4:
+					handleLogout();
 					break;
 				case 5:
 					break;
@@ -65,6 +66,7 @@ function printMenu(): void {
 
 function printLoginMenu(): void {
 	console.log('<회원정보 관리 프로그램>');
+	console.log(`로그인 되었습니다. [id: ${isLoggedIn?.memberId} / 이름: ${isLoggedIn?.name}]`);
 	console.log('1. 회원정보 리스트 보기');
 	console.log('2. 회원가입 하기');
 	console.log('3. 로그인');
@@ -97,6 +99,30 @@ function createListText(list: Member[]): string {
 	return listText;
 }
 
+// ID를 입력받고 검증하는 함수
+function validateAndFetchMember(): Member {
+	const idInput: string = handleIdInput();
+
+	const findedMember: Member | null = getOneMember(idInput);
+
+	if (findedMember === null) {
+		console.log('존재하지 않는 아이디입니다. 다시 입력해주세요.');
+		return validateAndFetchMember();
+	}
+
+	return findedMember;
+}
+
+// 비밀번호를 입력받고 검증하는 함수
+function validatePassword(member: Member): void {
+	const passwordInput: string = handlePasswordInput();
+
+	if (passwordInput !== member.password) {
+		console.log('비밀번호가 일치하지 않습니다. 다시 입력해주세요.');
+		validatePassword(member);
+	}
+}
+
 // 1. 회원정보 리스트 보기
 function printMemberList() {
 	const memberList: Member[] = getMemberListAll();
@@ -105,7 +131,7 @@ function printMemberList() {
 	console.log(renderText);
 }
 
-// 2. 회원가입 하기
+// 2. 회원가입 기능
 function handleSignup() {
 	console.log('\n<회원 가입>');
 
@@ -135,39 +161,27 @@ function handleSignup() {
 	}
 }
 
-// ID를 입력받고 검증하는 함수
-function validateAndFetchMember(): Member {
-	const idInput: string = handleIdInput();
-
-	const findedMember: Member | null = getOneMember(idInput);
-
-	if (findedMember === null) {
-		console.log('존재하지 않는 아이디입니다. 다시 입력해주세요.');
-		return validateAndFetchMember();
-	}
-
-	return findedMember;
-}
-
-// 비밀번호를 입력받고 검증하는 함수
-function validatePassword(member: Member): void {
-	const passwordInput: string = handlePasswordInput();
-
-	if (passwordInput !== member.password) {
-		console.log('비밀번호가 일치하지 않습니다. 다시 입력해주세요.');
-		validatePassword(member);
-	}
-}
-
-// 2. 로그인 하기
+// 3. 로그인 기능
 function handleLogin() {
 	console.log('\n아이디를 입력해주세요.');
 	const findedMember: Member = validateAndFetchMember();
 	console.log('비밀번호를 입력해주세요.');
 	validatePassword(findedMember);
 
-	loginToken = true;
+	isLoggedIn = findedMember;
 	console.log('로그인에 성공하였습니다.');
+}
+
+// 4. 로그아웃 기능
+function handleLogout() {
+	if (isLoggedIn === null) {
+		return;
+	}
+
+	const logoutMemberId = isLoggedIn.memberId;
+	isLoggedIn = null;
+
+	console.log(`${logoutMemberId}님이 로그아웃 하였습니다.`);
 }
 
 export default runApp;
