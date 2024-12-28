@@ -1,4 +1,4 @@
-export function isValidEmail(emailInput: string): boolean {
+export function isValidId(emailInput: string): boolean {
 	return emailInput.trim() !== '' && emailInput.length >= 4;
 }
 

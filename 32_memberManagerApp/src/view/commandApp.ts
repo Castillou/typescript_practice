@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import reader from 'readline-sync';
 import Member from '../model/Member';
-import { isValidEmail, isValidPassword, isValidName } from '../util/validator';
 import {
 	getMemberListAll,
 	getOneMember,
@@ -9,6 +8,13 @@ import {
 	updateMemberInfo,
 	deleteMember,
 } from '../modules/memberlistApi';
+import {
+	handleIdInput,
+	handleNameInput,
+	handlePasswordInput,
+	handleAgeInput,
+	handlePhoneInput,
+} from './inputHandlers';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -25,6 +31,7 @@ function runApp(): void {
 					printMemberList();
 					break;
 				case 2:
+					handleSignup();
 					break;
 				case 3:
 					break;
@@ -39,8 +46,8 @@ function runApp(): void {
 			}
 			console.log('');
 		} catch (error) {
-			console.error(error);
-			console.log('잘못된 입력입니다.');
+			console.error(`[ERROR] ${error}`);
+			console.log('잘못된 입력입니다.\n');
 		}
 	}
 }
@@ -55,9 +62,10 @@ function printMenu(): void {
 
 // createListText: list 입력값을 텍스트로 변환해서 반환하는 함수
 function createListText(list: Member[]): string {
-	let listText = '';
+	let listText: string = '';
 	list.forEach(({ mno, memberId, password, name, createdDate, age, phone, hobby }) => {
 		let optionalText = ``;
+
 		if (age) {
 			optionalText += `, 나이: ${age}`;
 		}
@@ -68,7 +76,7 @@ function createListText(list: Member[]): string {
 			optionalText += `, 취미: ${hobby.join(', ')}`;
 		}
 
-		listText += `\n${mno} - name: ${name}, id: ${memberId}, pwd: ${password}, 가입일: ${dayjs(
+		listText += `\n${mno} - 이름: ${name}, id: ${memberId}, pwd: ${password}, 가입일: ${dayjs(
 			createdDate
 		).format('YYYY-MM-DD')}${optionalText}`;
 	});
@@ -77,14 +85,41 @@ function createListText(list: Member[]): string {
 
 // 1. 회원정보 리스트 보기
 function printMemberList() {
-	const memberList = getMemberListAll();
-	let renderText = '\n<회원 목록>';
+	const memberList: Member[] = getMemberListAll();
+	let renderText: string = '\n<회원 목록>';
 	renderText += createListText(memberList);
 	console.log(renderText);
 }
 
 // 2. 회원가입 하기
-function handleSignup() {}
+function handleSignup() {
+	console.log('\n<회원 가입>');
+
+	console.log('아이디를 입력해주세요.');
+	const newId: string = handleIdInput();
+	console.log('비밀번호를 입력해주세요.');
+	const newPassword: string = handlePasswordInput();
+	console.log('이름를 입력해주세요.');
+	const newName: string = handleNameInput();
+
+	const memberList: Member[] = getMemberListAll();
+	const nextMno: number = Math.max(...memberList.map((member) => member.mno)) + 1;
+	const newMember: Member = {
+		mno: nextMno,
+		memberId: newId,
+		password: newPassword,
+		name: newName,
+		createdDate: new Date(),
+	};
+
+	const response = createMember(newMember);
+
+	if (response) {
+		console.log(`${newId}님의 회원가입이 완료 되었습니다.`);
+	} else {
+		console.log('회원가입에 실패하였습니다.');
+	}
+}
 
 // 2. 로그인 하기
 function handleLogin() {}

@@ -56,6 +56,7 @@ export function getOneMember(mno: number): Member | null {
 }
 
 export function createMember(newMember: Member): boolean {
+	memberList.push(newMember);
 	return true;
 }
 
