@@ -7,7 +7,7 @@ import {
 	createMember,
 	updateMember,
 	deleteMember,
-} from '../modules/todolistApi';
+} from '../modules/memberlistApi';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
