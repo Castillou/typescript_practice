@@ -6,18 +6,18 @@ abstract class Book {
 	protected writer: string;
 	protected _owner: Member | null;
 
-	constructor(bno: number, title: string, writer: string, owner: Member | null) {
+	constructor(bno: number, title: string, writer: string) {
 		this.bno = bno;
 		this.title = title;
 		this.writer = writer;
-		this._owner = owner;
+		this._owner = null;
 	}
 
-	get owner() {
+	public get owner() {
 		return this._owner;
 	}
 
-	set owner(owner: Member | null) {
+	public set owner(owner: Member | null) {
 		this._owner = owner;
 	}
 
@@ -27,8 +27,8 @@ abstract class Book {
 export class ITBook extends Book {
 	private language: string;
 
-	constructor(bno: number, title: string, writer: string, owner: Member | null, language: string) {
-		super(bno, title, writer, owner);
+	constructor(bno: number, title: string, writer: string, language: string) {
+		super(bno, title, writer);
 		this.language = language;
 	}
 
@@ -43,8 +43,8 @@ export class ITBook extends Book {
 export class CookBook extends Book {
 	private coupon: boolean;
 
-	constructor(bno: number, title: string, writer: string, owner: Member | null) {
-		super(bno, title, writer, owner);
+	constructor(bno: number, title: string, writer: string) {
+		super(bno, title, writer);
 		this.coupon = true;
 	}
 
@@ -71,8 +71,8 @@ export class CookBook extends Book {
 export class ComicBook extends Book {
 	private durability: number;
 
-	constructor(bno: number, title: string, writer: string, owner: Member | null) {
-		super(bno, title, writer, owner);
+	constructor(bno: number, title: string, writer: string) {
+		super(bno, title, writer);
 		this.durability = 100;
 	}
 

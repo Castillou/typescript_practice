@@ -1,7 +1,9 @@
 import reader from 'readline-sync';
 import Member from '../model/member';
+import Book from '../model/book';
 import { getMemberListAll } from '../modules/memberlistApi';
 import { validateAndFetchMember, validatePassword } from './inputView';
+import { getBookListAll } from '../modules/booklistApi';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -19,6 +21,8 @@ function runApp(): void {
 				case 1:
 					if (loggedInMember === null) {
 						handleLogin();
+					} else {
+						handleShowAllBooks();
 					}
 					break;
 				case 2:
@@ -70,7 +74,7 @@ function printLoginMenu(): void {
 	console.log('99. 종료하기');
 }
 
-// 1. 로그인 기능
+// 로그인 기능
 function handleLogin(): void {
 	console.log('\n아이디를 입력해주세요.');
 	const findedMember: Member = validateAndFetchMember();
@@ -81,11 +85,23 @@ function handleLogin(): void {
 	console.log('로그인에 성공하였습니다.');
 }
 
+// 1. 전체 도서 리스트 보기 기능
+function handleShowAllBooks(): void {
+	const books: Array<Book> = getBookListAll();
+
+	let renderText = '\n<전체 도서 리스트>';
+	books.forEach((book) => {
+		renderText += '\n' + book.info();
+	});
+
+	console.log(renderText);
+}
+
 // 6. 사용자 정보보기 기능
 function handleShowUsersInfo(): void {
-	const members = getMemberListAll();
+	const members: Array<Member> = getMemberListAll();
 
-	let renderText = '<사용자 정보보기>';
+	let renderText = '\n<사용자 정보보기>';
 	members.forEach((member) => {
 		renderText += member.info();
 	});
