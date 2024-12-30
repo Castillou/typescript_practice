@@ -1,9 +1,6 @@
 import Book, { ITBook, CookBook, ComicBook } from '../model/book';
-import { memberList } from './memberlistApi';
 
-const [member1, member2, member3] = memberList;
-
-const bookList: Array<Book> = [
+export const bookList: Array<Book> = [
 	new ITBook(100, '모던 자바스크립트', '이웅모', 'Javascript'),
 	new ITBook(101, '자바의 정석', '남궁성', 'Java'),
 	new ITBook(102, '열혈C언어', '윤성우', 'C'),
@@ -16,18 +13,6 @@ const bookList: Array<Book> = [
 	new ComicBook(302, '신의탑', '시우'),
 	new ComicBook(303, '귀멸의칼날', '악어'),
 ];
-
-bookList.forEach((book, idx) => {
-	if (idx < 2) {
-		book.owner = member1;
-	}
-	if (idx === 4 || idx === 5) {
-		book.owner = member2;
-	}
-	if (idx >= 9) {
-		book.owner = member3;
-	}
-});
 
 // memberApi
 export function getBookListAll(): Book[] {
