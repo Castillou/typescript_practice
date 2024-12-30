@@ -1,8 +1,7 @@
-import dayjs from 'dayjs';
 import reader from 'readline-sync';
 import Member from '../model/member';
-import { getMemberListAll, getOneMember } from '../modules/memberlistApi';
-import { handleIdInput, handlePasswordInput } from './inputView';
+import { getMemberListAll } from '../modules/memberlistApi';
+import { validateAndFetchMember, validatePassword } from './inputView';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -36,6 +35,7 @@ function runApp(): void {
 					break;
 				case 6:
 					if (loggedInMember === null) break;
+					handleShowUsersInfo();
 					break;
 				case 99:
 					return;
@@ -70,31 +70,7 @@ function printLoginMenu(): void {
 	console.log('99. 종료하기');
 }
 
-// ID를 입력받고 검증하는 함수
-function validateAndFetchMember(): Member {
-	const idInput: string = handleIdInput();
-
-	const findedMember: Member | null = getOneMember(idInput);
-
-	if (findedMember === null) {
-		console.log('존재하지 않는 아이디입니다. 다시 입력해주세요.');
-		return validateAndFetchMember();
-	}
-
-	return findedMember;
-}
-
-// 비밀번호를 입력받고 검증하는 함수
-function validatePassword(member: Member): void {
-	const passwordInput: string = handlePasswordInput();
-
-	if (passwordInput !== member.password) {
-		console.log('비밀번호가 일치하지 않습니다. 다시 입력해주세요.');
-		validatePassword(member);
-	}
-}
-
-// 3. 로그인 기능
+// 1. 로그인 기능
 function handleLogin(): void {
 	console.log('\n아이디를 입력해주세요.');
 	const findedMember: Member = validateAndFetchMember();
@@ -103,6 +79,18 @@ function handleLogin(): void {
 
 	loggedInMember = findedMember;
 	console.log('로그인에 성공하였습니다.');
+}
+
+// 6. 사용자 정보보기 기능
+function handleShowUsersInfo(): void {
+	const members = getMemberListAll();
+
+	let renderText = '<사용자 정보보기>';
+	members.forEach((member) => {
+		renderText += member.info();
+	});
+
+	console.log(renderText);
 }
 
 export default runApp;
