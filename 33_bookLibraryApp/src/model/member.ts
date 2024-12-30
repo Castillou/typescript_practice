@@ -1,3 +1,3 @@
-interface Member {}
+class Member {}
 
 export default Member;
