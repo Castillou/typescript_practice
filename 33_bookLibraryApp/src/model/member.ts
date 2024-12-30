@@ -5,8 +5,8 @@ class Member {
 	memberId: string;
 	password: string;
 	name: string;
-	borrowBookList: Array<Book> | null;
-	programLangList: Array<string> | null;
+	borrowBookList: Array<Book>;
+	programLangList: Array<string>;
 
 	constructor(mno: number, memberId: string, password: string, name: string) {
 		this.mno = mno;
@@ -31,6 +31,10 @@ class Member {
 		}
 
 		return infoText;
+	}
+
+	public learnProgramLang(lang: string): void {
+		this.programLangList.push(lang);
 	}
 }
 

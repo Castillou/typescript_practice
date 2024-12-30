@@ -33,11 +33,7 @@ export class ITBook extends Book {
 	}
 
 	public info(): string {
-		const isAvailableForLoanText =
-			this._owner === null
-				? ` / 대출가능`
-				: ` / 대출불가(소유자: ${this._owner.memberId}, ${this._owner.name})`;
-		return `${this.bno} - ITBook / ${this.title}, ${this.writer} / ${this.language}${isAvailableForLoanText}`;
+		return `${this.bno} - ITBook / ${this.title}, ${this.writer} / ${this.language}`;
 	}
 
 	public getLanguage(): string {
@@ -53,13 +49,9 @@ export class CookBook extends Book {
 	}
 
 	public info(): string {
-		const isAvailableForLoanText =
-			this._owner === null
-				? ` / 대출가능`
-				: ` / 대출불가(소유자: ${this._owner.memberId}, ${this._owner.name})`;
 		return `${this.bno} - CookBook / ${this.title}, ${this.writer} / ${
 			this.coupon ? '요리쿠폰 있음' : '요리쿠폰 없음'
-		}${isAvailableForLoanText}`;
+		}`;
 	}
 
 	public getCoupon(): boolean {
@@ -85,11 +77,7 @@ export class ComicBook extends Book {
 	}
 
 	public info(): string {
-		const isAvailableForLoanText =
-			this._owner === null
-				? ` / 대출가능`
-				: ` / 대출불가(소유자: ${this._owner.memberId}, ${this._owner.name})`;
-		return `${this.bno} - ComicBook / ${this.title}, ${this.writer} / 내구도: ${this.durability}${isAvailableForLoanText}`;
+		return `${this.bno} - ComicBook / ${this.title}, ${this.writer} / 내구도: ${this.durability}`;
 	}
 
 	public minusDurability(): void {
