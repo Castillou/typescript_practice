@@ -40,5 +40,32 @@ export class ITBook extends Book {
 		return this.language;
 	}
 }
+export class CookBook extends Book {
+	private coupon: boolean;
+
+	constructor(bno: number, title: string, writer: string, owner: Member | null) {
+		super(bno, title, writer, owner);
+		this.coupon = true;
+	}
+
+	public info(): string {
+		return `${this.bno} - ITBook / ${this.title} / ${this.writer} / ${
+			this.coupon ? '요리쿠폰 있음' : '요리쿠폰 없음'
+		}`;
+	}
+
+	public getCoupon(): boolean {
+		return this.coupon;
+	}
+
+	public useCoupon(): void {
+		if (!this.coupon) {
+			console.log('쿠폰을 사용할 수 없습니다.');
+			return;
+		}
+		this.coupon = false;
+		console.log(`${this.title} 요리 쿠폰을 사용하였습니다.`);
+	}
+}
 
 export default Book;
