@@ -1,5 +1,5 @@
 import reader from 'readline-sync';
-import Book, { ComicBook, CookBook, ITBook } from '../model/book';
+import Book from '../model/book';
 
 // 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
 export function selectBook(bookList: Array<Book>, questionText: string = '') {
