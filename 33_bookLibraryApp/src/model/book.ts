@@ -21,6 +21,10 @@ abstract class Book {
 		this._owner = owner;
 	}
 
+	public getTitle() {
+		return this.title;
+	}
+
 	public abstract info(): string;
 }
 

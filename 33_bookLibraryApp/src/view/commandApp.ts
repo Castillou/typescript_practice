@@ -34,6 +34,7 @@ function runApp(): void {
 					break;
 				case 4:
 					if (loggedInMember === null) break;
+					returnBook();
 					break;
 				case 5:
 					if (loggedInMember === null) break;
@@ -155,6 +156,23 @@ function chooseAction(borrowBooks: Array<Book>): void {
 	}
 }
 
+// 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
+function selectBook(bookList: Array<Book>, questionText: string = '') {
+	const selectedBookNumber = reader.question(`${questionText}> `);
+	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
+
+	if (selectedBookNumber === '99') {
+		throw new Error('취소되었습니다');
+	}
+
+	if (!selectedBook) {
+		console.log('리스트에 존재하는 번호를 입력해주세요.');
+		return selectBook(bookList);
+	}
+
+	return selectedBook;
+}
+
 // 2-2. 어떤 도서로 행동을 진행할지 선택하는 함수
 function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	if (bookList.length === 0) {
@@ -165,13 +183,8 @@ function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	bookList.forEach((book) => {
 		console.log(book.info());
 	});
-	const selectedBookNumber = reader.question('> ');
-	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
 
-	if (!selectedBook) {
-		console.log('리스트에 존재하는 번호를 입력해주세요.');
-		return selectedBookAction(bookList);
-	}
+	const selectedBook = selectBook(bookList);
 
 	if (selectedBook instanceof ITBook) {
 		const learnningLang = selectedBook?.getLanguage();
@@ -208,25 +221,50 @@ function borrowBook(): void {
 	borrowBookAction(availableBooks);
 }
 
-// 3-1 도서 선택 및 대여 액션 함수
+// 3-1 대여할 도서 선택 및 액션 함수
 function borrowBookAction(bookList: Array<Book>): void {
-	const selectedBookNumber = reader.question('빌릴 책을 입력하세요\n> ');
-	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
-
-	if (selectedBookNumber === '99') {
-		console.log('취소되었습니다.');
-		return;
-	}
-
-	if (!selectedBook) {
-		console.log('리스트에 존재하는 번호를 입력해주세요.');
-		return borrowBookAction(bookList);
-	}
+	const selectedBook = selectBook(bookList, '빌릴 책을 입력하세요\n');
 
 	loggedInMember?.borrowBookList.push(selectedBook);
 	selectedBook.owner = loggedInMember;
 
 	console.log(`대출이 완료되었습니다.`);
+}
+
+// 4. 도서 반납하기 기능
+function returnBook(): void {
+	const borrowBooks: Array<Book> = loggedInMember?.borrowBookList ?? [];
+
+	let renderText = '\n<반납할 도서 리스트>';
+
+	if (borrowBooks.length === 0) {
+		console.log('반납할 도서가 없습니다.');
+		return;
+	}
+
+	borrowBooks.forEach((book) => {
+		renderText += '\n' + book.info();
+	});
+
+	console.log(renderText);
+
+	returnBookAction(borrowBooks);
+}
+
+// 4-1 반납할 도서 선택 및 액션 함수
+function returnBookAction(bookList: Array<Book>): void {
+	const selectedBook = selectBook(bookList, '반납할 책을 입력하세요\n');
+
+	const currentUserBookList = loggedInMember?.borrowBookList;
+
+	if (!currentUserBookList) {
+		return;
+	}
+
+	const bookIndex = currentUserBookList.indexOf(selectedBook);
+	currentUserBookList.splice(bookIndex, 1);
+	selectedBook.owner = null;
+	console.log(`${selectedBook.getTitle()}이 반납 되었습니다.`);
 }
 
 // 6. 사용자 정보보기 기능
