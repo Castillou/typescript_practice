@@ -44,6 +44,7 @@ export class ITBook extends Book {
 		return this.language;
 	}
 }
+
 export class CookBook extends Book {
 	private coupon: boolean;
 

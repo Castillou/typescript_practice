@@ -12,6 +12,7 @@ import {
 	validateDurabilityInput,
 } from './inputView';
 import { BookData, createNewBook, getBookListAll } from '../modules/booklistApi';
+import { selectBook } from '../util/helper';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -94,23 +95,6 @@ function handleLogin(): void {
 
 	loggedInMember = findedMember;
 	console.log('로그인에 성공하였습니다.');
-}
-
-// 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
-function selectBook(bookList: Array<Book>, questionText: string = '') {
-	const selectedBookNumber = reader.question(`${questionText}> `);
-	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
-
-	if (selectedBookNumber === '99') {
-		throw new Error('취소되었습니다');
-	}
-
-	if (!selectedBook) {
-		console.log('리스트에 존재하는 번호를 입력해주세요.');
-		return selectBook(bookList);
-	}
-
-	return selectedBook;
 }
 
 ////////// 1. 전체 도서 리스트 보기 기능
@@ -275,7 +259,7 @@ function returnBookAction(bookList: Array<Book>): void {
 	const bookIndex = currentUserBookList.indexOf(selectedBook);
 	currentUserBookList.splice(bookIndex, 1);
 	selectedBook.owner = null;
-	console.log(`${selectedBook.getTitle()}이 반납 되었습니다.`);
+	console.log(`${selectedBook.getTitle()}이(가) 반납 되었습니다.`);
 }
 
 ////////// 5. 도서 기증하기 기능
