@@ -93,13 +93,7 @@ export const bookList: Array<Book> = [
 	new ComicBook(303, '귀멸의칼날', '고토게', 50),
 ];
 
-// memberApi
-export function getBookListAll(): Book[] {
-	bookList.sort((a, b) => Number(a.info().substring(0, 3)) - Number(b.info().substring(0, 3)));
-	return bookList;
-}
-
-// 선택된 번호의 카테고리에 해당하는 책들의 배열을 반환하는 헬퍼 함수
+// 선택한 번호에 해당하는 카테고리의 책 배열을 반환하는 함수
 function getBooksByCategory<T extends Book>(categoryNumber: number): Array<T> {
 	let filteredBooks: Array<Book> = [];
 
@@ -120,6 +114,11 @@ function getBooksByCategory<T extends Book>(categoryNumber: number): Array<T> {
 function createNextBookNumber(books: Array<Book>): number {
 	const nextNumber = Math.max(...books.map((book) => Number(book.info().substring(0, 3)))) + 1;
 	return nextNumber;
+}
+
+export function getBookListAll(): Book[] {
+	bookList.sort((a, b) => Number(a.info().substring(0, 3)) - Number(b.info().substring(0, 3)));
+	return bookList;
 }
 
 export function createNewBook(categoryNumber: number, bookData: BookData) {

@@ -1,7 +1,7 @@
 import reader from 'readline-sync';
 import Book from '../model/book';
 
-// 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
+// 사용자가 책 번호를 입력하면 해당 번호에 해당하는 책을 찾아 반환하는 함수
 export function selectBook(bookList: Array<Book>, questionText: string = '') {
 	const selectedBookNumber = reader.question(`${questionText}> `);
 	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));

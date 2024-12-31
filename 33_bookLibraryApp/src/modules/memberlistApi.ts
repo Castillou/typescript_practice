@@ -16,7 +16,6 @@ member3.borrowBookList.forEach((book) => (book.owner = member3));
 
 const memberList: Array<Member> = [member1, member2, member3];
 
-// memberApi
 export function getMemberListAll(): Member[] {
 	return memberList;
 }

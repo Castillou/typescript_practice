@@ -99,7 +99,7 @@ export function validateTitleInput(questionText: string = ''): string {
 	return titleInput;
 }
 
-// 이름 입력값 핸들러
+// 카테고리 입력값 핸들러
 export function validateCategoryInput(questionText: string = ''): number {
 	const categoryInput: string = reader.question(`${questionText}> `);
 
@@ -115,6 +115,7 @@ export function validateCategoryInput(questionText: string = ''): number {
 	return Number(categoryInput);
 }
 
+// 쿠폰 입력값 핸들러
 export function validateCouponInput(questionText: string = ''): boolean {
 	const couponInput: string = reader.question(`${questionText}> `);
 
@@ -130,6 +131,7 @@ export function validateCouponInput(questionText: string = ''): boolean {
 	return couponInput === 'Y';
 }
 
+// 내구도 입력값 핸들러
 export function validateDurabilityInput(questionText: string = ''): number {
 	const durabilityInput: string = reader.question(`${questionText}> `);
 
