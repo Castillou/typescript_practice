@@ -47,9 +47,9 @@ export class ITBook extends Book {
 export class CookBook extends Book {
 	private coupon: boolean;
 
-	constructor(bno: number, title: string, writer: string) {
+	constructor(bno: number, title: string, writer: string, coupon: boolean) {
 		super(bno, title, writer);
-		this.coupon = true;
+		this.coupon = coupon;
 	}
 
 	public info(): string {
@@ -75,9 +75,9 @@ export class CookBook extends Book {
 export class ComicBook extends Book {
 	private durability: number;
 
-	constructor(bno: number, title: string, writer: string) {
+	constructor(bno: number, title: string, writer: string, durability: number) {
 		super(bno, title, writer);
-		this.durability = 100;
+		this.durability = durability;
 	}
 
 	public info(): string {

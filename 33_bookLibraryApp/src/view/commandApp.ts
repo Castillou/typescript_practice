@@ -2,8 +2,16 @@ import reader from 'readline-sync';
 import Member from '../model/member';
 import Book, { ComicBook, CookBook, ITBook } from '../model/book';
 import { getMemberListAll } from '../modules/memberlistApi';
-import { validateAndFetchMember, validatePassword } from './inputView';
-import { getBookListAll } from '../modules/booklistApi';
+import {
+	validateNameInput,
+	validateTitleInput,
+	validateAndFetchMember,
+	validatePassword,
+	validateCategoryInput,
+	validateCouponInput,
+	validateDurabilityInput,
+} from './inputView';
+import { BookData, createNewBook, getBookListAll } from '../modules/booklistApi';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -26,7 +34,7 @@ function runApp(): void {
 					break;
 				case 2:
 					if (loggedInMember === null) break;
-					getMyBorrowedBooks();
+					getBorrowedBooks();
 					break;
 				case 3:
 					if (loggedInMember === null) break;
@@ -38,6 +46,7 @@ function runApp(): void {
 					break;
 				case 5:
 					if (loggedInMember === null) break;
+					donateBook();
 					break;
 				case 6:
 					if (loggedInMember === null) break;
@@ -87,7 +96,24 @@ function handleLogin(): void {
 	console.log('로그인에 성공하였습니다.');
 }
 
-// 1. 전체 도서 리스트 보기 기능
+// 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
+function selectBook(bookList: Array<Book>, questionText: string = '') {
+	const selectedBookNumber = reader.question(`${questionText}> `);
+	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
+
+	if (selectedBookNumber === '99') {
+		throw new Error('취소되었습니다');
+	}
+
+	if (!selectedBook) {
+		console.log('리스트에 존재하는 번호를 입력해주세요.');
+		return selectBook(bookList);
+	}
+
+	return selectedBook;
+}
+
+////////// 1. 전체 도서 리스트 보기 기능
 function getAllBooks(): void {
 	const books: Array<Book> = getBookListAll();
 
@@ -103,8 +129,8 @@ function getAllBooks(): void {
 	console.log(renderText);
 }
 
-// 2. 내가 대여한 도서 보기
-function getMyBorrowedBooks(): void {
+////////// 2. 내가 대여한 도서 보기 기능
+function getBorrowedBooks(): void {
 	let renderText = '\n<내가 대여한 도서 보기>';
 
 	const borrowBooks = loggedInMember?.borrowBookList ?? [];
@@ -113,6 +139,8 @@ function getMyBorrowedBooks(): void {
 		renderText += '\n아직 대여한 도서가 없습니다.';
 		return;
 	}
+
+	borrowBooks.sort((a, b) => Number(a.info().substring(0, 3)) - Number(b.info().substring(0, 3)));
 
 	borrowBooks.forEach((book) => {
 		renderText += '\n' + book.info();
@@ -156,23 +184,6 @@ function chooseAction(borrowBooks: Array<Book>): void {
 	}
 }
 
-// 사용자가 책 번호를 입력하고 해당 번호에 맞는 책을 찾아 반환하는 헬퍼 함수
-function selectBook(bookList: Array<Book>, questionText: string = '') {
-	const selectedBookNumber = reader.question(`${questionText}> `);
-	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
-
-	if (selectedBookNumber === '99') {
-		throw new Error('취소되었습니다');
-	}
-
-	if (!selectedBook) {
-		console.log('리스트에 존재하는 번호를 입력해주세요.');
-		return selectBook(bookList);
-	}
-
-	return selectedBook;
-}
-
 // 2-2. 어떤 도서로 행동을 진행할지 선택하는 함수
 function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	if (bookList.length === 0) {
@@ -201,7 +212,7 @@ function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	}
 }
 
-// 3. 도서 대여하기 기능
+////////// 3. 도서 대여하기 기능
 function borrowBook(): void {
 	const availableBooks: Array<Book> = getBookListAll().filter((book) => book.owner === null);
 
@@ -231,7 +242,7 @@ function borrowBookAction(bookList: Array<Book>): void {
 	console.log(`대출이 완료되었습니다.`);
 }
 
-// 4. 도서 반납하기 기능
+////////// 4. 도서 반납하기 기능
 function returnBook(): void {
 	const borrowBooks: Array<Book> = loggedInMember?.borrowBookList ?? [];
 
@@ -267,7 +278,36 @@ function returnBookAction(bookList: Array<Book>): void {
 	console.log(`${selectedBook.getTitle()}이 반납 되었습니다.`);
 }
 
-// 6. 사용자 정보보기 기능
+////////// 5. 도서 기증하기 기능
+function donateBook() {
+	let renderText = '\n<도서 기증하기(생성)>\n책의 종류\n1) ITBook, 2) CookBook, 3) ComicBook';
+	console.log(renderText);
+
+	const categoryNumber: number = validateCategoryInput();
+	const title: string = validateTitleInput('도서의 이름을 입력하세요.\n');
+	const writer: string = validateNameInput('저자\n');
+
+	let bookData: BookData = { title, writer };
+	if (categoryNumber === 1) {
+		const language: string = reader.question('언어\n> ');
+		bookData.language = language;
+	}
+
+	if (categoryNumber === 2) {
+		const coupon: boolean = validateCouponInput('쿠폰 유무(Y/N)\n');
+		bookData.coupon = coupon;
+	}
+
+	if (categoryNumber === 3) {
+		const durability: number = validateDurabilityInput('내구도\n');
+		bookData.durability = durability;
+	}
+
+	createNewBook(categoryNumber, bookData);
+	console.log('기증이 완료되었습니다.');
+}
+
+////////// 6. 사용자 정보보기 기능
 function getUserInfo(): void {
 	const members: Array<Member> = getMemberListAll();
 
