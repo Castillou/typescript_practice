@@ -30,6 +30,7 @@ function runApp(): void {
 					break;
 				case 3:
 					if (loggedInMember === null) break;
+					borrowBook();
 					break;
 				case 4:
 					if (loggedInMember === null) break;
@@ -102,7 +103,7 @@ function getAllBooks(): void {
 }
 
 // 2. 내가 대여한 도서 보기
-function getMyBorrowedBooks() {
+function getMyBorrowedBooks(): void {
 	let renderText = '\n<내가 대여한 도서 보기>';
 
 	const borrowBooks = loggedInMember?.borrowBookList ?? [];
@@ -118,10 +119,11 @@ function getMyBorrowedBooks() {
 
 	console.log(renderText);
 
-	selectBookAction(borrowBooks);
+	chooseAction(borrowBooks);
 }
 
-function selectBookAction(borrowBooks: Array<Book>): void {
+// 2-1. 어떤 행동을 할지 선택하는 함수
+function chooseAction(borrowBooks: Array<Book>): void {
 	try {
 		console.log('메뉴: 1) 프로그램 공부하기, 2) 요리쿠폰 사용, 3) 만화책 보기, 4) 끝내기');
 		const input = reader.question('> ');
@@ -153,6 +155,7 @@ function selectBookAction(borrowBooks: Array<Book>): void {
 	}
 }
 
+// 2-2. 어떤 도서로 행동을 진행할지 선택하는 함수
 function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	if (bookList.length === 0) {
 		console.log('해당 도서가 존재하지 않습니다.');
@@ -167,6 +170,7 @@ function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 
 	if (!selectedBook) {
 		console.log('리스트에 존재하는 번호를 입력해주세요.');
+		return selectedBookAction(bookList);
 	}
 
 	if (selectedBook instanceof ITBook) {
@@ -182,6 +186,47 @@ function selectedBookAction<T extends Book>(bookList: Array<T>): void {
 	if (selectedBook instanceof ComicBook) {
 		selectedBook.minusDurability();
 	}
+}
+
+// 3. 도서 대여하기 기능
+function borrowBook(): void {
+	const availableBooks: Array<Book> = getBookListAll().filter((book) => book.owner === null);
+
+	let renderText = '\n<대출 가능한 도서 리스트>';
+
+	if (availableBooks.length === 0) {
+		console.log('대출 가능한 도서가 없습니다.');
+		return;
+	}
+
+	availableBooks.forEach((book) => {
+		renderText += '\n' + book.info() + ' / 대출가능';
+	});
+
+	console.log(renderText);
+
+	borrowBookAction(availableBooks);
+}
+
+// 3-1 도서 선택 및 대여 액션 함수
+function borrowBookAction(bookList: Array<Book>): void {
+	const selectedBookNumber = reader.question('빌릴 책을 입력하세요\n> ');
+	const selectedBook = bookList.find((book) => book.info().startsWith(selectedBookNumber));
+
+	if (selectedBookNumber === '99') {
+		console.log('취소되었습니다.');
+		return;
+	}
+
+	if (!selectedBook) {
+		console.log('리스트에 존재하는 번호를 입력해주세요.');
+		return borrowBookAction(bookList);
+	}
+
+	loggedInMember?.borrowBookList.push(selectedBook);
+	selectedBook.owner = loggedInMember;
+
+	console.log(`대출이 완료되었습니다.`);
 }
 
 // 6. 사용자 정보보기 기능
