@@ -3,10 +3,11 @@ import reader from 'readline-sync';
 import TodoItem from '../model/todoitem';
 import {
 	getTodoListAll,
-	getListItem,
 	createTodo,
 	updateTodo,
 	deleteTodo,
+	getIncompleteTodoList,
+	getCompleteTodoList,
 } from '../modules/todolistApi';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
@@ -89,7 +90,7 @@ function inputTodoList(): void {
 	console.log('\n<TodoList 추가하기>\n할일을 입력해주세요.');
 	const newTask = reader.question('> ').trim();
 
-	if (newTask === '') {
+	if (!newTask) {
 		console.log('할일의 내용을 입력해주세요.');
 		return inputTodoList();
 	}
@@ -117,7 +118,7 @@ function inputTodoList(): void {
 
 // 3. todolist 완료 하기
 function completeTodo(): void {
-	const incompleteTasks = getTodoListAll().filter((item) => !item.isCompleted);
+	const incompleteTasks = getIncompleteTodoList();
 
 	let txt = '\n<TodoList 미완료 리스트>';
 	txt += createListText(incompleteTasks);
@@ -141,9 +142,8 @@ function completeTodo(): void {
 	let updatedItem = updateTodo(targetNumber);
 
 	if (updatedItem) {
-		const updatedTodoList = getTodoListAll();
-		const completeTasks = updatedTodoList.filter((item) => item.isCompleted).length;
-		const incompleteTasks = updatedTodoList.filter((item) => !item.isCompleted).length;
+		const completeTasks = getCompleteTodoList().length;
+		const incompleteTasks = getIncompleteTodoList().length;
 		console.log(
 			`${updatedItem.task}가 ${dayjs(updatedItem.completedDate).format(
 				'YYYY-MM-DD HH:mm:ss'
@@ -156,7 +156,7 @@ function completeTodo(): void {
 
 // 4. todolist 완료 개수 확인하기
 function checkCompletedTodos(): void {
-	const completeTasks = getTodoListAll().filter((item) => item.isCompleted);
+	const completeTasks = getCompleteTodoList();
 
 	let txt = `\n현재까지 완료된 일은 총 ${completeTasks.length}개 입니다.`;
 	txt += '\n<TodoList 완료 리스트>';
@@ -164,6 +164,7 @@ function checkCompletedTodos(): void {
 	console.log(txt);
 }
 
+// 5. todolist 할일 삭제하기
 function deleteTodoItem() {
 	printTodoList();
 	const todoListNumbers = getTodoListAll().map((item) => item.no);
@@ -184,7 +185,7 @@ function deleteTodoItem() {
 
 	let listLength = deleteTodo(targetNumber);
 	if (listLength) {
-		console.log(`todo를  삭제하였습니다. (항목: 총 ${listLength}개)`);
+		console.log(`todo를 삭제하였습니다. (항목: 총 ${listLength}개)`);
 	} else {
 		console.log('todo 삭제에 실패하였습니다.');
 	}
