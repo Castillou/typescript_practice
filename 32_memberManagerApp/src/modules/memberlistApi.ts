@@ -1,7 +1,5 @@
 import Member from '../model/Member';
 
-// const memberList: Member[] = [];
-
 const memberList: Member[] = [
 	{
 		mno: 1,

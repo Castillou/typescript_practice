@@ -1,7 +1,5 @@
 import TodoItem from '../model/todoitem';
 
-// const todoList: TodoItem[] = [];
-
 const todoList: TodoItem[] = [
 	{
 		no: 1,
@@ -47,6 +45,14 @@ export function getTodoListAll(): TodoItem[] {
 export function getListItem(no: number): TodoItem | null {
 	const item: TodoItem = todoList.find((item) => item.no === no)!;
 	return item;
+}
+
+export function getCompleteTodoList() {
+	return todoList.filter((item) => item.isCompleted);
+}
+
+export function getIncompleteTodoList() {
+	return todoList.filter((item) => !item.isCompleted);
 }
 
 export function createTodo(newItem: TodoItem): number {
