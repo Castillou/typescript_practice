@@ -44,7 +44,7 @@ function handlePasswordInput(): string {
 }
 
 // ID를 입력받고 검증하는 함수
-export function validateAndFetchMember(): Member {
+function validateAndFetchMember(): Member {
 	const idInput: string = handleIdInput();
 
 	const findedMember: Member | null = getOneMember(idInput);
@@ -58,7 +58,7 @@ export function validateAndFetchMember(): Member {
 }
 
 // 비밀번호를 입력받고 검증하는 함수
-export function validatePassword(member: Member): void {
+function validatePassword(member: Member): void {
 	const passwordInput: string = handlePasswordInput();
 
 	if (passwordInput !== member.password) {
@@ -68,7 +68,7 @@ export function validatePassword(member: Member): void {
 }
 
 // 이름 입력값 핸들러
-export function validateNameInput(questionText: string = ''): string {
+function validateNameInput(questionText: string = ''): string {
 	const nameInput: string = reader.question(`${questionText}> `);
 
 	if (nameInput === '999') {
@@ -84,7 +84,7 @@ export function validateNameInput(questionText: string = ''): string {
 }
 
 // 제목 입력값 핸들러
-export function validateTitleInput(questionText: string = ''): string {
+function validateTitleInput(questionText: string = ''): string {
 	const titleInput: string = reader.question(`${questionText}> `);
 
 	if (titleInput === '999') {
@@ -100,7 +100,7 @@ export function validateTitleInput(questionText: string = ''): string {
 }
 
 // 카테고리 입력값 핸들러
-export function validateCategoryInput(questionText: string = ''): number {
+function validateCategoryInput(questionText: string = ''): number {
 	const categoryInput: string = reader.question(`${questionText}> `);
 
 	if (categoryInput === '999') {
@@ -116,7 +116,7 @@ export function validateCategoryInput(questionText: string = ''): number {
 }
 
 // 쿠폰 입력값 핸들러
-export function validateCouponInput(questionText: string = ''): boolean {
+function validateCouponInput(questionText: string = ''): boolean {
 	const couponInput: string = reader.question(`${questionText}> `);
 
 	if (couponInput === '999') {
@@ -132,7 +132,7 @@ export function validateCouponInput(questionText: string = ''): boolean {
 }
 
 // 내구도 입력값 핸들러
-export function validateDurabilityInput(questionText: string = ''): number {
+function validateDurabilityInput(questionText: string = ''): number {
 	const durabilityInput: string = reader.question(`${questionText}> `);
 
 	if (durabilityInput === '999') {
@@ -146,3 +146,13 @@ export function validateDurabilityInput(questionText: string = ''): number {
 
 	return Number(durabilityInput);
 }
+
+export default {
+	validateNameInput,
+	validateTitleInput,
+	validateAndFetchMember,
+	validatePassword,
+	validateCategoryInput,
+	validateCouponInput,
+	validateDurabilityInput,
+};

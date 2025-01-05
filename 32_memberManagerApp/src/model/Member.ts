@@ -10,6 +10,3 @@ interface Member {
 }
 
 export default Member;
-
-// git commit -m ":art:style: 옵션에 undefined 타입 추가 및 MemberForm 파일 추가"
-// git commit -m ":recycle:refactor: book에서 확장된 클래스인 itbook, cookbook, comicbook을 별도의 파일로 분리"

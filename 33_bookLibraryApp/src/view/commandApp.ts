@@ -1,18 +1,13 @@
 import reader from 'readline-sync';
 import Member from '../model/member';
-import Book, { ComicBook, CookBook, ITBook } from '../model/book';
+import Book from '../model/book';
+import ITBook from '../model/itbook';
+import CookBook from '../model/cookbook';
+import ComicBook from '../model/comicbook';
 import { getMemberListAll } from '../modules/memberlistApi';
-import {
-	validateNameInput,
-	validateTitleInput,
-	validateAndFetchMember,
-	validatePassword,
-	validateCategoryInput,
-	validateCouponInput,
-	validateDurabilityInput,
-} from './inputView';
+import inputView from './inputView';
 import { BookData, createNewBook, getBookListAll } from '../modules/booklistApi';
-import { selectBook } from '../util/helper';
+import { selectBook } from '../util/selectBook';
 
 // 윈도우에서 한글 입력 안되는 경우 chcp 65001
 reader.setDefaultOptions({ encoding: 'utf8' });
@@ -89,9 +84,9 @@ function printLoginMenu(): void {
 // 로그인 기능
 function handleLogin(): void {
 	console.log('\n아이디를 입력해주세요.');
-	const findedMember: Member = validateAndFetchMember();
+	const findedMember: Member = inputView.validateAndFetchMember();
 	console.log('비밀번호를 입력해주세요.');
-	validatePassword(findedMember);
+	inputView.validatePassword(findedMember);
 
 	loggedInMember = findedMember;
 	console.log('로그인에 성공하였습니다.');
@@ -267,9 +262,9 @@ function donateBook() {
 	let renderText = '\n<도서 기증하기(생성)>\n책의 종류\n1) ITBook, 2) CookBook, 3) ComicBook';
 	console.log(renderText);
 
-	const categoryNumber: number = validateCategoryInput();
-	const title: string = validateTitleInput('도서의 이름을 입력하세요.\n');
-	const writer: string = validateNameInput('저자\n');
+	const categoryNumber: number = inputView.validateCategoryInput();
+	const title: string = inputView.validateTitleInput('도서의 이름을 입력하세요.\n');
+	const writer: string = inputView.validateNameInput('저자\n');
 
 	let bookData: BookData = { title, writer };
 	if (categoryNumber === 1) {
@@ -278,12 +273,12 @@ function donateBook() {
 	}
 
 	if (categoryNumber === 2) {
-		const coupon: boolean = validateCouponInput('쿠폰 유무(Y/N)\n');
+		const coupon: boolean = inputView.validateCouponInput('쿠폰 유무(Y/N)\n');
 		bookData.coupon = coupon;
 	}
 
 	if (categoryNumber === 3) {
-		const durability: number = validateDurabilityInput('내구도\n');
+		const durability: number = inputView.validateDurabilityInput('내구도\n');
 		bookData.durability = durability;
 	}
 

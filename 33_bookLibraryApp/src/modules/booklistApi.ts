@@ -1,5 +1,7 @@
-import Book, { ITBook, CookBook, ComicBook } from '../model/book';
-
+import Book from '../model/book';
+import ITBook from '../model/itbook';
+import CookBook from '../model/cookbook';
+import ComicBook from '../model/comicbook';
 export interface BookData {
 	title: string;
 	writer: string;
@@ -21,8 +23,8 @@ class ITBookFactory implements BookFactory {
 	}
 
 	getNextNumber(): number {
-		const ITBooks = getBooksByCategory(1);
-		return createNextBookNumber(ITBooks);
+		const ITBooks = getBooksByCategory<ITBook>(1);
+		return createNextBookNumber<ITBook>(ITBooks);
 	}
 
 	validateData(bookData: BookData): void {
@@ -39,8 +41,8 @@ class CookBookFactory implements BookFactory {
 	}
 
 	getNextNumber(): number {
-		const CookBooks = getBooksByCategory(2);
-		return createNextBookNumber(CookBooks);
+		const CookBooks = getBooksByCategory<CookBook>(2);
+		return createNextBookNumber<CookBook>(CookBooks);
 	}
 
 	validateData(bookData: BookData): void {
@@ -62,8 +64,8 @@ class ComicBookFactory implements BookFactory {
 	}
 
 	getNextNumber(): number {
-		const ComicBooks = getBooksByCategory(3);
-		return createNextBookNumber(ComicBooks);
+		const ComicBooks = getBooksByCategory<ComicBook>(3);
+		return createNextBookNumber<ComicBook>(ComicBooks);
 	}
 
 	validateData(bookData: BookData): void {
@@ -111,7 +113,7 @@ function getBooksByCategory<T extends Book>(categoryNumber: number): Array<T> {
 }
 
 // 책의 다음 번호를 생성하는 헬퍼 함수
-function createNextBookNumber(books: Array<Book>): number {
+function createNextBookNumber<T extends Book>(books: Array<T>): number {
 	const nextNumber = Math.max(...books.map((book) => Number(book.info().substring(0, 3)))) + 1;
 	return nextNumber;
 }
