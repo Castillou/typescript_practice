@@ -1,3 +1,45 @@
+// Project State Management
+
+class ProjectState {
+	private listeners: any[] = [];
+	private projects: any[] = [];
+	private static instance: ProjectState;
+
+	private constructor() {}
+
+	static getInstance() {
+		if (this.instance) {
+			return this.instance;
+		}
+		this.instance = new ProjectState();
+		return this.instance;
+	}
+
+	addListener(listenerFn: Function) {
+		this.listeners.push(listenerFn);
+	}
+
+	addProject(title: string, description: string, numOfPeople: number) {
+		const newProject = {
+			id: Math.random().toString(),
+			title: title,
+			description: description,
+			people: numOfPeople,
+		};
+		this.projects.push(newProject);
+
+		for (const listenerFn of this.listeners) {
+			listenerFn(this.projects.slice());
+		}
+	}
+}
+
+// 싱글톤
+// : 생성자가 여러 차례 호출되더라도 실제로 생성되는 객체는 하나이고,
+// 최초 생성 이후에 호출된 생성자는 최초의 생성자가 생성한 객체를 리턴한다.
+// -> 프로젝트에 대해 하나의 상태 관리 객체만 있기를 원하기 때문에 사용
+const projectState = ProjectState.getInstance();
+
 // Validation
 interface Validatable {
 	value: string | number;
@@ -52,17 +94,33 @@ class ProjectList {
 	templeteElement: HTMLTemplateElement;
 	hostElement: HTMLDivElement;
 	element: HTMLElement;
+	assignedProjects: any[];
 
 	constructor(private type: 'active' | 'finished') {
 		this.templeteElement = document.getElementById('project-list')! as HTMLTemplateElement;
 		this.hostElement = document.getElementById('app')! as HTMLDivElement;
+		this.assignedProjects = [];
 
 		const importNode = document.importNode(this.templeteElement.content, true);
 		this.element = importNode.firstElementChild as HTMLElement;
 		this.element.id = `${this.type}-projects`;
 
+		projectState.addListener((projects: any[]) => {
+			this.assignedProjects = projects;
+			this.renderProjects();
+		});
+
 		this.attach();
 		this.renderContent();
+	}
+
+	private renderProjects() {
+		const listEl = document.getElementById(`${this.type}-projects-list`)! as HTMLUListElement;
+		for (const prjItem of this.assignedProjects) {
+			const listItem = document.createElement('li');
+			listItem.textContent = prjItem.title;
+			listEl.appendChild(listItem);
+		}
 	}
 
 	private renderContent() {
@@ -148,9 +206,7 @@ class ProjectInput {
 		const userInput = this.gatherUserInput();
 		if (Array.isArray(userInput)) {
 			const [title, description, people] = userInput;
-			console.log('title: ' + title);
-			console.log('description: ' + description);
-			console.log('people: ' + people);
+			projectState.addProject(title, description, people);
 			this.clearInput();
 		}
 	}
